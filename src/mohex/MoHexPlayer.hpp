@@ -24,6 +24,11 @@ public:
     /** Returns "mohex". */
     std::string Name() const;
 
+    int StochasticBest(SgUctValue maxGames, double maxTime,
+            vector<SgMove>& sequence,
+            const vector<SgMove>& rootFilter,
+            SgUctTree* initTree, double tempurature);
+
     /** Returns the search. */
     MoHexSearch& Search();
 

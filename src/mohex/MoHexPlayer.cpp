@@ -95,6 +95,110 @@ void MoHexPlayer::CopySettingsFrom(const MoHexPlayer& other)
 
 //----------------------------------------------------------------------------
 
+int MoHexPlayer::StochasticBest(SgUctValue maxGames, double maxTime,
+        vector<SgMove>& sequence,
+        const vector<SgMove>& rootFilter,
+        SgUctTree* initTree, double tempurature)
+{
+	sequence.clear();
+	double norm_const = 0;
+	m_search.Search(m_max_games, maxTime, sequence, rootFilter, initTree, 0);
+	SgUctMoveSelect moveSelect =m_search.MoveSelect();
+	const SgUctNode* selectedChild = 0;
+	int selectedScore = 0;
+	for (SgUctChildIterator it(m_search.Tree(), m_search.Tree().Root()); it; ++it)
+	    {
+	        const SgUctNode& child = *it;
+	        if (  ! child.HasMean()
+	           && ! (  (  moveSelect == SG_UCTMOVESELECT_BOUND
+	                   || moveSelect == SG_UCTMOVESELECT_ESTIMATE
+	                   )
+	                && m_search.Rave()
+	                && child.HasRaveValue()
+	                )
+	            )
+	            continue;
+	        if (child.IsProvenLoss()) // Always choose winning move!
+	        {
+	            selectedChild = &child;
+	            break;
+	        }
+	        SgUctValue value;
+	        switch (moveSelect)
+	        {
+	        case SG_UCTMOVESELECT_VALUE:
+	            value = m_search.InverseEstimate((SgUctValue)child.Mean());
+	            break;
+	        case SG_UCTMOVESELECT_COUNT:
+	            value = child.MoveCount();
+	            break;
+	        case SG_UCTMOVESELECT_BOUND:
+	            value = m_search.GetBound(m_search.Rave(), m_search.Tree().Root(), child);
+	            break;
+	        default:
+	            SG_ASSERT(false);
+	            value = SG_UCTMOVESELECT_VALUE;
+	        }
+	        norm_const+=exp(value/tempurature);
+	    }
+
+		double r = ((double) rand() / (RAND_MAX));
+		double running_sum = 0;
+
+		for (SgUctChildIterator it(m_search.Tree(), m_search.Tree().Root()); it; ++it)
+		    {
+		        const SgUctNode& child = *it;
+		        if (  ! child.HasMean()
+		           && ! (  (  moveSelect == SG_UCTMOVESELECT_BOUND
+		                   || moveSelect == SG_UCTMOVESELECT_ESTIMATE
+		                   )
+		                && m_search.Rave()
+		                && child.HasRaveValue()
+		                )
+		            )
+		            continue;
+		        if (child.IsProvenLoss()) // Always choose winning move!
+		        {
+		            selectedChild = &child;
+		            break;
+		        }
+		        SgUctValue value;
+		        switch (moveSelect)
+		        {
+		        case SG_UCTMOVESELECT_VALUE:
+		            value = m_search.InverseEstimate((SgUctValue)child.Mean());
+		            break;
+		        case SG_UCTMOVESELECT_COUNT:
+		            value = child.MoveCount();
+		            break;
+		        case SG_UCTMOVESELECT_BOUND:
+		            value = m_search.GetBound(m_search.Rave(), m_search.Tree().Root(), child);
+		            break;
+		        default:
+		            SG_ASSERT(false);
+		            value = SG_UCTMOVESELECT_VALUE;
+		        }
+		        running_sum+=exp(value/tempurature);
+		        if(running_sum/norm_const > r){
+		        	selectedChild = &child;
+		        	selectedScore = value;
+		        	break;
+		        }
+		    }
+
+	const SgUctNode* current = selectedChild;
+		    while (true)
+		    {
+		        current = m_search.FindBestChild(*current, m_search.MoveSelect());
+		        if (current == 0)
+		            break;
+		        sequence.push_back(current->Move());
+		        if (! current->HasChildren())
+		            break;
+		    }
+		    return selectedScore;
+}
+
 HexPoint MoHexPlayer::Search(const HexState& state, const Game& game,
                              HexBoard& brd, const bitset_t& given_to_consider,
                              double maxTime, double& score)
@@ -159,8 +263,8 @@ HexPoint MoHexPlayer::Search(const HexState& state, const Game& game,
     std::vector<SgMove> sequence;
     std::vector<SgMove> rootFilter;
     m_search.SetBoard(brd);
-    score = m_search.Search(m_max_games, maxTime, sequence,
-                            rootFilter, initTree, 0);
+    score = StochasticBest(m_max_games, maxTime, sequence,
+                 rootFilter, initTree, 1);
 
     // Output stats
     std::ostringstream os;
