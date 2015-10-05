@@ -38,6 +38,10 @@ public:
     /** See MaxTime() */
     void SetMaxTime(double time);
 
+    double Temperature();
+
+    void SetTemperature(double temperature);
+
     std::size_t MinDepth() const;
 
     void SetMinDepth(std::size_t min);
@@ -75,6 +79,8 @@ public:
 private: 
     WolveSearch m_search;
 
+    double m_temperature;
+
     boost::scoped_ptr<SgSearchHashTable> m_hashTable;
 
     /** See MaxTime() */
@@ -103,6 +109,10 @@ private:
 inline std::string WolvePlayer::Name() const
 {
     return "wolve";
+}
+
+inline double WolvePlayer::Temperature(){
+	return m_temperature;
 }
 
 inline WolveSearch& WolvePlayer::Search()
@@ -138,6 +148,11 @@ inline std::size_t WolvePlayer::MaxDepth() const
 inline void WolvePlayer::SetMaxDepth(std::size_t max)
 {
     m_maxDepth = max;
+}
+
+inline void WolvePlayer::SetTemperature(double temperature)
+{
+	m_temperature = temperature;
 }
 
 inline SgSearchHashTable* WolvePlayer::HashTable()

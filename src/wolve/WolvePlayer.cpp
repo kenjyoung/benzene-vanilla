@@ -13,6 +13,7 @@
 #include "Misc.hpp"
 #include "SequenceHash.hpp"
 #include "WolvePlayer.hpp"
+#include "time.h"
 
 using namespace benzene;
 
@@ -42,6 +43,7 @@ std::string PrintSgScore(int score)
 WolvePlayer::WolvePlayer()
     : BenzenePlayer(),
       m_hashTable(new SgSearchHashTable(1 << 20)),
+	  m_temperature(250),
       m_maxTime(10),
       m_minDepth(1),
       m_maxDepth(99),
@@ -92,8 +94,29 @@ HexPoint WolvePlayer::Search(const HexState& state, const Game& game,
         WolveSearchUtil::DumpGuiFx(state, *m_hashTable);
     LogInfo() << PrintStatistics(score, PV);
     outScore = score;
-    if (PV.Length() > 0)
-        return static_cast<HexPoint>(PV[0]);
+    double temperature = m_temperature;
+    if(temperature == 0 && PV.Length()>0){
+    	return static_cast<HexPoint> (PV[0]);
+    }
+    std::vector<std::pair<HexPoint, double> > moveValues = WolveSearchUtil::GetScores(state, *HashTable());
+    if (moveValues.size()>0){
+    	std::vector<std::pair<HexPoint, double> >::iterator it;
+    		double r = SgRandom::Global().Float(1);
+    		double normConst = 0;
+    		for(it = moveValues.begin(); it<moveValues.end(); it++){
+    			normConst+=std::exp((*it).second/temperature);
+    		}
+
+    		double runningSum = 0;
+    		for(it = moveValues.begin(); it!=moveValues.end(); it++){
+    			runningSum+=std::exp((*it).second/temperature);
+    			if(runningSum/normConst > r){
+    				outScore = (*it).second;
+    				return (*it).first;
+    			}
+    		}
+    		return moveValues.back().first;
+    }
     LogWarning() << "**** WolveSearch returned empty sequence!\n"
 		 << "**** Returning random move!\n";
     return BoardUtil::RandomEmptyCell(state.Position());

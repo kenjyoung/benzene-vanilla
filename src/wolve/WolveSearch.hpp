@@ -319,6 +319,9 @@ namespace WolveSearchUtil
     std::string PrintScores(const HexState& state,
                             const SgSearchHashTable& hashTable);
 
+    std::vector<std::pair<HexPoint, double> > GetScores(const HexState& state,
+                                             const SgSearchHashTable& hashTable);
+
     /** Obtain PV by examining the hashtable. */
     void ExtractPVFromHashTable(const HexState& state, 
                                 const SgSearchHashTable& hashTable, 

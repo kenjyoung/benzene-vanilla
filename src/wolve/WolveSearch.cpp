@@ -12,6 +12,8 @@
 #include "EndgameUtil.hpp"
 #include "SequenceHash.hpp"
 #include "WolveSearch.hpp"
+#include <vector>
+#include <utility>
 
 using namespace benzene;
 
@@ -133,6 +135,28 @@ std::string WolveSearchUtil::PrintScores(const HexState& state,
     }
     return os.str();
 }
+
+std::vector<std::pair<HexPoint, double> > WolveSearchUtil::GetScores(const HexState& state,
+                                         	 	 	 	 	 	 	 const SgSearchHashTable& hashTable)
+{
+	std::vector<std::pair<HexPoint, double> > moveValues;
+    HexState myState(state);
+    for (BitsetIterator p(state.Position().GetEmpty()); p; ++p)
+    {
+        myState.PlayMove(*p);
+        SgSearchHashData data;
+        if (hashTable.Lookup(myState.Hash(), &data))
+        {
+            int value = -data.Value();
+            moveValues.push_back(std::pair<HexPoint, double> (*p, value));
+
+        }
+        myState.UndoMove(*p);
+    }
+    return moveValues;
+}
+
+
 
 void WolveSearchUtil::DumpGuiFx(const HexState& state, 
                                 const SgSearchHashTable& hashTable)

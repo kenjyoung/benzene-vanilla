@@ -146,6 +146,8 @@ void WolveEngine::CmdParam(HtpCommand& cmd)
             << m_player.MaxTime() << '\n'
             << "[string] min_depth "
             << m_player.MinDepth() << '\n'
+			<< "[int] temperature "
+			<< m_player.Temperature() << '\n'
             << "[string] tt_bits "
             << (m_player.HashTable() 
                 ? log2(m_player.HashTable()->MaxHash()) : 0);
@@ -175,6 +177,8 @@ void WolveEngine::CmdParam(HtpCommand& cmd)
             search.SetGuiFx(cmd.Arg<bool>(1));
         else if (name == "search_singleton")
             m_player.SetSearchSingleton(cmd.Arg<bool>(1));
+        else if (name == "temperature")
+        	m_player.SetTemperature(cmd.Arg<double>(1));
         else if (name == "tt_bits")
 	{
 	    int bits = cmd.ArgMin<int>(1, 0);
