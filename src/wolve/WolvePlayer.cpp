@@ -95,8 +95,13 @@ HexPoint WolvePlayer::Search(const HexState& state, const Game& game,
     LogInfo() << PrintStatistics(score, PV);
     outScore = score;
     double temperature = m_temperature;
-    if(temperature == 0 && PV.Length()>0){
-    	return static_cast<HexPoint> (PV[0]);
+    if(temperature == 0){
+    	if(PV.Length()>0) return static_cast<HexPoint> (PV[0]);
+    	else{
+    		return BoardUtil::RandomEmptyCell(state.Position());
+    	    LogWarning() << "**** WolveSearch returned empty sequence!\n"
+    			 << "**** Returning random move!\n";
+    	}
     }
     std::vector<std::pair<HexPoint, double> > moveValues = WolveSearchUtil::GetScores(state, *HashTable());
     if (moveValues.size()>0){
@@ -117,9 +122,6 @@ HexPoint WolvePlayer::Search(const HexState& state, const Game& game,
     		}
     		return moveValues.back().first;
     }
-    LogWarning() << "**** WolveSearch returned empty sequence!\n"
-		 << "**** Returning random move!\n";
-    return BoardUtil::RandomEmptyCell(state.Position());
 }
 
 std::string WolvePlayer::PrintStatistics(int score, const SgVector<SgMove>& pv)
