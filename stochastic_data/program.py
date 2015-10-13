@@ -70,6 +70,7 @@ class Program:
                 answer += line
         if answer[0] != '=':
             self._denyReason = answer[2:].strip()
+            print(self._denyReason)
             raise Program.CommandDenied
         if numberLines == 1:
             return string.strip(answer[1:])

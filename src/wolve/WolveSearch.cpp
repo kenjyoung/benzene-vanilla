@@ -193,6 +193,7 @@ WolveSearch::WolveSearch()
       m_backup_ice_info(true),
       m_useGuiFx(false)
 {
+	SgRandom::Global().SetSeed(0);
 }
 
 WolveSearch::~WolveSearch()
