@@ -132,6 +132,9 @@ HexPoint WolvePlayer::Search(const HexState& state, const Game& game,
     		}
     		return moveValues.back().first;
     }
+    return BoardUtil::RandomEmptyCell(state.Position());
+    LogWarning() << "**** WolveSearch returned empty sequence!\n"
+		 << "**** Returning random move!\n";
 }
 
 std::string WolvePlayer::PrintStatistics(int score, const SgVector<SgMove>& pv)
