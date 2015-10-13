@@ -14,6 +14,9 @@
 #include "SequenceHash.hpp"
 #include "WolvePlayer.hpp"
 #include "time.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace benzene;
 
@@ -109,8 +112,15 @@ HexPoint WolvePlayer::Search(const HexState& state, const Game& game,
     		double r = SgRandom::Global().Float(1);
     		double normConst = 0;
     		for(it = moveValues.begin(); it<moveValues.end(); it++){
+    			if((*it).first==PV[0]) outScore = (*it).second;
     			normConst+=std::exp((*it).second/temperature);
     		}
+
+    		std::ofstream best_stats;
+    		std::stringstream filename;
+    		filename << "best_" << temperature;
+    		best_stats.open(filename.str().c_str(), std::ios::app);
+    		best_stats << std::exp(outScore/temperature)/normConst << std::endl;
 
     		double runningSum = 0;
     		for(it = moveValues.begin(); it!=moveValues.end(); it++){
