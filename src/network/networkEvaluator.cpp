@@ -4,7 +4,7 @@
 #include <iostream>
 #include "networkEvaluator.h"
 
-#define NETWORK_DIR "/Users/kenny_789/Summer_2015/benzene-vanilla/src/mohex/network/"
+#define NETWORK_DIR "/Users/kenny_789/Summer_2015/benzene-vanilla/src/network/"
 
 networkEvaluator::networkEvaluator(){
 	setenv("PYTHONPATH",NETWORK_DIR,1);

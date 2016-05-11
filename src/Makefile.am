@@ -8,6 +8,7 @@ book \
 solver \
 simpleplayers \
 commonengine \
+network \
 wolve \
 mohex \
 benzenetest \

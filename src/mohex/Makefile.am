@@ -47,6 +47,7 @@ mohex_DEPENDENCIES = \
 ../book/libbook.a \
 ../solver/libsolver.a \
 ../commonengine/libcommonengine.a \
+../network/libnetwork.a \
 $(FUEGO_BUILD)/smartgame/libfuego_smartgame.a \
 $(FUEGO_BUILD)/gtpengine/libfuego_gtpengine.a
 
@@ -63,6 +64,7 @@ $(BOOST_CPPFLAGS) \
 -I@top_srcdir@/src/hex \
 -I@top_srcdir@/src/book \
 -I@top_srcdir@/src/solver \
--I@top_srcdir@/src/commonengine
+-I@top_srcdir@/src/commonengine \
+-I@top_srcdir@/src/network
 
 DISTCLEANFILES = *~
