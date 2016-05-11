@@ -10,9 +10,11 @@ int main(){
 		state[i]=false;
 	}
 	//0=white 1=black
-	eval.evaluate(state, 0, scores);
-	for(int i=0; i<board_size; i++){
-		std::cout<<scores[i]<<" ";
+	for(int i=0; i<1000; i++){
+			eval.evaluate(state, 0, scores);
+			for(int i=0; i<board_size; i++){
+				std::cout<<scores[i]<<" ";
+			}
+		std::cout<<std::endl;
 	}
-	std::cout<<std::endl;
 }

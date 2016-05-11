@@ -4,8 +4,10 @@
 #include <iostream>
 #include "networkEvaluator.h"
 
+#define NETWORK_DIR "/Users/kenny_789/Summer_2015/benzene-vanilla/src/mohex/network/"
+
 networkEvaluator::networkEvaluator(){
-	setenv("PYTHONPATH",".",1);
+	setenv("PYTHONPATH",NETWORK_DIR,1);
 	Py_Initialize();
 	import_array();
 	PyObject *evalModule = PyImport_Import(PyString_FromString((char*) "networkEvaluator"));
